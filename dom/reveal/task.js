@@ -13,10 +13,13 @@ function isVisible(el){
     return true;
 }
 
-setInterval(() => {
+document.addEventListener("scroll", () => {
     for(let i=0; i< reveals.length; i++){
         if(isVisible(reveals[i])){
-            reveals[i].classList.toggle("reveal_active");
+            reveals[i].classList.add("reveal_active");
+        }
+        else{
+            reveals[i].classList.remove("reveal_active");
         }
     }
-}, 1000)
+});
