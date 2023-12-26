@@ -1,49 +1,50 @@
 let input = document.getElementById("task__input");
-let toDo = document.getElementById("tasks__list");
 let form = document.getElementById("tasks__form");
 let myStorage = window.localStorage;
+let removes = document.querySelectorAll(".task__remove");
+let tasks = document.querySelectorAll(".task");
+
+if(myStorage.length){
+    document.getElementById("tasks__list").outerHTML = myStorage['tasks'];
+    removes = document.querySelectorAll(".task__remove");
+    tasks = document.querySelectorAll(".task");
+    for(let i=0; i<Array.from(removes).length; i++){
+        Array.from(removes)[i].onclick = (e) => {
+            Array.from(tasks)[i].remove();
+            myStorage.setItem("tasks", document.getElementById("tasks__list").outerHTML);
+            e.preventDefault();
+        }
+    }
+}
+
 
 form.addEventListener("submit", (e) => {
-    let listElem = document.createElement("div");
-    let listText = document.createElement("div");
-    let del = document.createElement("a");
-    listElem.classList.add("task");
-    listText.classList.add("task__title");
-    listText.innerText = input.value;
-    del.innerHTML = "&times;";
-    del.classList.add("task__remove");
-    del.href = "#";
-    listElem.appendChild(listText);
-    listElem.appendChild(del);
-    toDo.appendChild(listElem);
-    myStorage.setItem( `task${toDo.children.length}`, listElem.outerHTML);
+    if(input.value.trim() === ""){
+        e.preventDefault();
+        form.reset();
+        return;
+    }
+    document.getElementById("tasks__list").insertAdjacentHTML('afterBegin', `
+    <div class="task">
+    <div class="task__title">
+    ${input.value}
+    </div>
+    <a href="#" class="task__remove">&times;</a>
+    </div>
+    `)
+    myStorage.setItem("tasks", document.getElementById("tasks__list").outerHTML);
+    removes = document.querySelectorAll(".task__remove");
+    tasks = document.querySelectorAll(".task");
     e.preventDefault();
     form.reset();
+    for(let i=0; i<Array.from(removes).length; i++){
+        Array.from(removes)[i].onclick = (e) => {
+            Array.from(tasks)[i].remove();
+            myStorage.setItem("tasks", document.getElementById("tasks__list").outerHTML);
+            e.preventDefault();
+        }
+    }
 });
 
-let removes, tasks;
 
-setInterval(()=>{
-    removes = Array.from(document.getElementsByClassName("task__remove"));
-    tasks =  Array.from(document.getElementsByClassName("task"));
-    for(let i=0; i<removes.length; i++){
-        removes[i].onclick = (e) => {
-            tasks[i].remove();
-            let key1 = Object.keys(myStorage).find(key => myStorage[key] === tasks[i].outerHTML);
-            myStorage.removeItem(key1);
-            e.preventDefault();
-        };
-    }
-},1000);
-
-window.onload = () => {
-    let keys = Object.keys(myStorage);
-    if(keys.length){
-    for(let key of keys) {
-        let element = document.createElement('div');
-        toDo.appendChild(element);
-        toDo.lastElementChild.outerHTML = myStorage.getItem(key);
-    }
-}
-}
 
