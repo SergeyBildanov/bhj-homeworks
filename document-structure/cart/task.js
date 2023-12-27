@@ -24,7 +24,6 @@ for(let i=0; i<adds.length; i++){
         if(Array.from(cartProducts).length !== 0){
             for(let j=0; j<Array.from(cartProducts).length; j++){
                 if(productsImages[i].closest(".product").dataset.id === Array.from(cartProducts)[j].dataset.id){
-                    let key1 = Object.keys(myStorage1).find(key => myStorage1[key] === cartProducts[j].outerHTML);
                     Array.from(cartProducts)[j].querySelector(".cart__product-count").textContent = Number(Array.from(cartProducts)[j].querySelector(".cart__product-count").textContent) + Number(values[i].innerText);
                     let anim = document.createElement("img");
                     productsImages[i].closest(".product").insertBefore(anim, productsImages[i]);
@@ -45,84 +44,79 @@ for(let i=0; i<adds.length; i++){
                             anim.remove()
                         }
                     });
-                    myStorage1[key1] = cartProducts[j].outerHTML;
+                    myStorage1.setItem( `products`, document.querySelector(".cart__products").outerHTML);
                     return;
                 }
             }
         }
-        let image = document.createElement("img");
-        image.className = "";
-        image.classList.add("cart__product-image");
-        image.src = productsImages[i].src;
-        image.alt = "";
-        let count = document.createElement("div");
-        let controls = document.createElement("div");
-        controls.innerHTML = productsImages[i].parentElement.querySelector(".product__quantity-controls").innerHTML;
-        controls.querySelector(".product__quantity-value").remove();
-        count.replaceWith(values[i]);
-        count.className = "";
-        count.classList.add("cart__product-count")
-        count.innerText = values[i].innerText;
-        let cartElem = document.createElement("div");
-        cartElem.insertAdjacentElement("afterBegin", image);
-        cartElem.insertAdjacentElement("beforeEnd", count);
-        cartElem.insertAdjacentElement("beforeEnd", controls);
-        cartElem.classList.add("cart__product");
-        cartElem.dataset.id = productsImages[i].parentElement.dataset.id;
-        cart.appendChild(cartElem);
-        myStorage1.setItem( `product${cart.children.length}`, cartElem.outerHTML);
+        document.querySelector(".cart__products").insertAdjacentHTML("afterBegin", `
+        <div class="cart__product" data-id="${i+1}">
+        <img class="cart__product-image" src="${productsImages[i].src}" alt="">
+        <div class="cart__product-count">${values[i].innerText}</div>
+        <div>
+        <div class="product__quantity-control product__quantity-control_dec">
+            -
+        </div>
+        
+        <div class="product__quantity-control product__quantity-control_inc">
+            +
+        </div>
+        </div></div>`);
+        myStorage1.setItem( `products`, document.querySelector(".cart__products").outerHTML);
+        document.querySelector(".cart").style.display = "block";
         values[i].innerText = 1;
+        for(let k=0; k<Array.from(cartProducts).length; k++){
+            Array.from(cartProducts)[k].querySelector(".product__quantity-control_dec").onclick = (e) => {
+                for(let j=0; j<cartProducts.length; j++){
+                    if(e.currentTarget.parentElement.closest(".cart__product").dataset.id === cartProducts[j].dataset.id){
+                        let count = Array.from(cartProducts)[j].querySelector(".cart__product-count").innerText - 1;
+                        if(count === 0){
+                            Array.from(cartProducts)[j].remove();
+                            myStorage1.setItem( `products`, document.querySelector(".cart__products").outerHTML);
+                            if(Array.from(cartProducts).length === 0){
+                                document.querySelector(".cart").style.display = "none";
+                            }
+                        }
+                        else{
+                            Array.from(cartProducts)[j].querySelector(".cart__product-count").textContent--;
+                            myStorage1.setItem( `products`, document.querySelector(".cart__products").outerHTML);
+                        }
+                    }
+                }
+            };
+            Array.from(cartProducts)[k].querySelector(".product__quantity-control_inc").onclick = () => {
+                Array.from(cartProducts)[k].querySelector(".cart__product-count").textContent++;
+                myStorage1.setItem( `products`, document.querySelector(".cart__products").outerHTML);
+            };
+        }
 });
 }
-setInterval(() => {
+
+window.onload = () => {
+    if(myStorage1.length){
+        cart.outerHTML = myStorage1.getItem("products");
+    }
     for(let i=0; i<Array.from(cartProducts).length; i++){
         Array.from(cartProducts)[i].querySelector(".product__quantity-control_dec").onclick = () => {
             let count = Array.from(cartProducts)[i].querySelector(".cart__product-count").textContent - 1;
             if(count === 0){
-                for(j=0; j<Object.keys(myStorage1).length; j++){
-                    let isEqual  = myStorage1[Object.keys(myStorage1)[j]] === cartProducts[i].outerHTML;
-                    if(isEqual){
-                        myStorage1.removeItem(Object.keys(myStorage1)[j]);
-                    }
-                }
                 Array.from(cartProducts)[i].remove();
+                myStorage1.setItem( `products`, document.querySelector(".cart__products").outerHTML);
             }
             else{
-                for(j=0; j<Object.keys(myStorage1).length; j++){
-                    let isEqual  = myStorage1[Object.keys(myStorage1)[j]] === cartProducts[i].outerHTML;
-                    if(isEqual){
-                        Array.from(cartProducts)[i].querySelector(".cart__product-count").textContent--;
-                        myStorage1[Object.keys(myStorage1)[j]] = cartProducts[i].outerHTML;
-                    }
-                }
+                Array.from(cartProducts)[i].querySelector(".cart__product-count").textContent--;
+                myStorage1.setItem( `products`, document.querySelector(".cart__products").outerHTML);
             }
         };
         Array.from(cartProducts)[i].querySelector(".product__quantity-control_inc").onclick = () => {
-            for(j=0; j<Object.keys(myStorage1).length; j++){
-                let isEqual  = myStorage1[Object.keys(myStorage1)[j]] === cartProducts[i].outerHTML;
-                if(isEqual){
-                    Array.from(cartProducts)[i].querySelector(".cart__product-count").textContent++;
-                    myStorage1[Object.keys(myStorage1)[j]] = cartProducts[i].outerHTML;
-                }
-            }
+            Array.from(cartProducts)[i].querySelector(".cart__product-count").textContent++;
+            myStorage1.setItem( `products`, document.querySelector(".cart__products").outerHTML);
         };
-
     }
-    if(Array.from(cartProducts).length === 0){
-        document.querySelector(".cart").style.display = "none";
+    if(Array.from(cartProducts).length !== 0){
+        document.querySelector(".cart").style.display = "block";
     }
     else{
-        document.querySelector(".cart").style.display = "block";  
-    }
-});
-window.onload = () => {
-    let keys = Object.keys(myStorage1);
-    if(keys.length){
-        for(let key of keys) {
-            let element = document.createElement('div');
-            cart.appendChild(element);
-            cart.lastElementChild.outerHTML = myStorage1.getItem(key);
-        }
+        document.querySelector(".cart").style.display = "none";
     }
 }
-
