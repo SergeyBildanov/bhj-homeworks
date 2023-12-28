@@ -1,13 +1,11 @@
 let input = document.getElementById("task__input");
 let form = document.getElementById("tasks__form");
-let myStorage = window.localStorage;
 let removes = document.querySelectorAll(".task__remove");
 let tasks = document.querySelectorAll(".task");
 let inputs;
 
-if(typeof myStorage["tasks"] !== "undefined"){
-    //document.getElementById("tasks__list").outerHTML = myStorage['tasks'];
-    let inputs = myStorage["tasks"].split(",");
+if(typeof localStorage["tasks"] !== "undefined"){
+    let inputs = localStorage["tasks"].split(",");
     for(let i = 0; i<inputs.length; i++){
         document.getElementById("tasks__list").insertAdjacentHTML('beforeEnd', `
         <div class="task">
@@ -25,9 +23,9 @@ if(typeof myStorage["tasks"] !== "undefined"){
             Array.from(tasks)[i].remove();
             tasks = document.querySelectorAll(".task");
             inputs = getInputs(Array.from(tasks));
-            myStorage.setItem("tasks", inputs);
-            if(myStorage["tasks"] === "undefined"){
-                myStorage.removeItem("tasks");
+            localStorage.setItem("tasks", inputs);
+            if(localStorage["tasks"] === "undefined"){
+                localStorage.removeItem("tasks");
             }
             e.preventDefault();
         }
@@ -52,7 +50,7 @@ form.addEventListener("submit", (e) => {
     removes = document.querySelectorAll(".task__remove");
     tasks = document.querySelectorAll(".task");
     inputs = getInputs(Array.from(tasks));
-    myStorage.setItem("tasks", inputs);
+    localStorage.setItem("tasks", inputs);
     e.preventDefault();
     form.reset();
     for(let i=0; i<Array.from(removes).length; i++){
@@ -60,9 +58,9 @@ form.addEventListener("submit", (e) => {
             Array.from(tasks)[i].remove();
             tasks = document.querySelectorAll(".task");
             inputs = getInputs(Array.from(tasks));
-            myStorage.setItem("tasks", inputs);
-            if(myStorage["tasks"] === "undefined"){
-                myStorage.removeItem("tasks");
+            localStorage.setItem("tasks", inputs);
+            if(localStorage["tasks"] === "undefined"){
+                localStorage.removeItem("tasks");
             }
             e.preventDefault();
         }
