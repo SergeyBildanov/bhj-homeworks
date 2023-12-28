@@ -3,15 +3,32 @@ let form = document.getElementById("tasks__form");
 let myStorage = window.localStorage;
 let removes = document.querySelectorAll(".task__remove");
 let tasks = document.querySelectorAll(".task");
+let inputs;
 
-if(myStorage.length){
-    document.getElementById("tasks__list").outerHTML = myStorage['tasks'];
+if(typeof myStorage["tasks"] !== "undefined"){
+    //document.getElementById("tasks__list").outerHTML = myStorage['tasks'];
+    let inputs = myStorage["tasks"].split(",");
+    for(let i = 0; i<inputs.length; i++){
+        document.getElementById("tasks__list").insertAdjacentHTML('beforeEnd', `
+        <div class="task">
+        <div class="task__title">
+        ${inputs[i]}
+        </div>
+        <a href="#" class="task__remove">&times;</a>
+        </div>
+    `   )
+    }
     removes = document.querySelectorAll(".task__remove");
     tasks = document.querySelectorAll(".task");
     for(let i=0; i<Array.from(removes).length; i++){
         Array.from(removes)[i].onclick = (e) => {
             Array.from(tasks)[i].remove();
-            myStorage.setItem("tasks", document.getElementById("tasks__list").outerHTML);
+            tasks = document.querySelectorAll(".task");
+            inputs = getInputs(Array.from(tasks));
+            myStorage.setItem("tasks", inputs);
+            if(myStorage["tasks"] === "undefined"){
+                myStorage.removeItem("tasks");
+            }
             e.preventDefault();
         }
     }
@@ -31,20 +48,37 @@ form.addEventListener("submit", (e) => {
     </div>
     <a href="#" class="task__remove">&times;</a>
     </div>
-    `)
-    myStorage.setItem("tasks", document.getElementById("tasks__list").outerHTML);
+    `);
     removes = document.querySelectorAll(".task__remove");
     tasks = document.querySelectorAll(".task");
+    inputs = getInputs(Array.from(tasks));
+    myStorage.setItem("tasks", inputs);
     e.preventDefault();
     form.reset();
     for(let i=0; i<Array.from(removes).length; i++){
         Array.from(removes)[i].onclick = (e) => {
             Array.from(tasks)[i].remove();
-            myStorage.setItem("tasks", document.getElementById("tasks__list").outerHTML);
+            tasks = document.querySelectorAll(".task");
+            inputs = getInputs(Array.from(tasks));
+            myStorage.setItem("tasks", inputs);
+            if(myStorage["tasks"] === "undefined"){
+                myStorage.removeItem("tasks");
+            }
             e.preventDefault();
         }
     }
 });
+
+function getInputs(arr){
+    let resultArr = [];
+    if(arr.length){
+        for(let i=0; i<arr.length; i++){
+            resultArr.push(arr[i].querySelector(".task__title").textContent);
+        }
+        return Array.from(resultArr);
+    }
+    return;
+}
 
 
 
