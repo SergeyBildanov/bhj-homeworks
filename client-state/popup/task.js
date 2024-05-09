@@ -1,12 +1,16 @@
-function setCookie(name, value, expires){
-    document.cookie = `${name}=${encodeURIComponent(value)}; ${(expires==null) ? "" : ";Expires=" + expires.toGMTString()}`;
+function setCookie(name, value){
+    document.cookie = `${name}=${encodeURIComponent(value)}; max-age: ${3600*1000}`;
     console.log(document.cookie);
 }
 
 function getCookie(name){
-    const pairs = document.cookie.split(";");
-    const cookie = pairs.find(p=>p.startsWith(name+"="))
-    return cookie.substring(name.length+1);
+    if(document.cookie){
+        const pairs = document.cookie.split(";");
+        const cookie = pairs.find(p=>p.startsWith(name+"="))
+        return cookie.substring(name.length+1);
+    }
+    return "false";
+    
 }
 
 let modal = document.querySelector(".modal")
@@ -18,10 +22,8 @@ else{
     modal.classList.remove("modal_active")
 }
 modal.addEventListener("click", (e)=>{
-    if(e.target && e.target.closest(".modal__close")){
-       let date = new Date();
-       date.setHours(date.getHours()+1);
-       setCookie("isClosed", true, date);
+    if(e.target && e.target.closest(".modal__close")){;
+       setCookie("isClosed", true);
        modal.classList.remove("modal_active");
     }
 })
